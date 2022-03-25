@@ -94,6 +94,7 @@ resource "azurerm_key_vault_key" "key_vault_key" {
   key_type     = "RSA"
   key_vault_id = azurerm_key_vault.key_vault.id
   name         = "kvk-${local.common_resource_suffix}"
+  key_opts     = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
 }
 
 data "azurerm_platform_image" "platform_image" {
