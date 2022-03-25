@@ -80,11 +80,11 @@ resource "azurerm_key_vault" "key_vault" {
     bypass         = "AzureServices"
     default_action = "Deny"
   }
-  purge_protection_enabled = true
-  resource_group_name      = azurerm_resource_group.resource_group.name
-  soft_delete_enabled      = true
-  sku_name                 = "standard"
-  tenant_id                = var.tenant_id
+  purge_protection_enabled   = true
+  resource_group_name        = azurerm_resource_group.resource_group.name
+  sku_name                   = "standard"
+  soft_delete_retention_days = 90
+  tenant_id                  = var.tenant_id
 }
 
 resource "azurerm_key_vault_key" "key_vault_key" {
