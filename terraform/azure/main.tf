@@ -62,9 +62,9 @@ resource "azurerm_network_interface" "network_interface" {
 
 data "azurerm_platform_image" "platform_image" {
   location  = var.region
-  offer     = "UbuntuServer"
+  offer     = "0001-com-ubuntu-server-impish"
   publisher = "Canonical"
-  sku       = "20.04-LTS"
+  sku       = "21_10-gen2"
 }
 
 resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
