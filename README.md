@@ -1,6 +1,6 @@
 # Fishtest
 
-[![CI](https://github.com/adyavanapalli/Fishtest/actions/workflows/ci.yml/badge.svg)](https://github.com/adyavanapalli/Fishtest/actions/workflows/ci.yml)
+[![CI](https://github.com/adyavanapalli/Fishtest/actions/workflows/ci.yaml/badge.svg)](https://github.com/adyavanapalli/Fishtest/actions/workflows/ci.yaml)
 
 A repository for provisioning resources for Fishtest on Azure/GCP/AWS.
 
