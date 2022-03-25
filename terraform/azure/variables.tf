@@ -17,7 +17,7 @@ variable "username" {
 }
 
 variable "virtual_machine_size" {
-  default     = "Standard_F8"
+  default     = "Standard_F8s_v2"
   description = "The SKU which should be used for the virtual machine."
   type        = string
 }
