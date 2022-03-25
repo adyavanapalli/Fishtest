@@ -26,7 +26,7 @@ resource "azurerm_resource_group" "resource_group" {
 }
 
 resource "azurerm_virtual_network" "virtual_network" {
-  address_space       = "10.0.0.0/29"
+  address_space       = ["10.0.0.0/29"]
   location            = var.region
   name                = "vnet-${local.common_resource_suffix}"
   resource_group_name = azurerm_resource_group.resource_group.name
