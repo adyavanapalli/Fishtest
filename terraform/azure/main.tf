@@ -74,15 +74,23 @@ resource "random_string" "key_vault_infix" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  location            = var.region
-  name                = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  sku_name            = "standard"
-  tenant_id           = var.tenant_id
+  location = var.region
+  name     = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
+  network_acls {
+    bypass         = "AzureServices"
+    default_action = "Deny"
+  }
+  purge_protection_enabled = true
+  resource_group_name      = azurerm_resource_group.resource_group.name
+  soft_delete_enabled      = true
+  sku_name                 = "standard"
+  tenant_id                = var.tenant_id
 }
 
 resource "azurerm_key_vault_key" "key_vault_key" {
-  key_size     = 4096
+  expiration_date = "2022-12-31T23:59:59Z"
+  key_size        = 4096
+  #bridgecrew:skip=CKV_AZURE_112:No RSA-HSM needed for this use-case.
   key_type     = "RSA"
   key_vault_id = azurerm_key_vault.key_vault.id
   name         = "kvk-${local.common_resource_suffix}"
