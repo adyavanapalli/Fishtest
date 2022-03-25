@@ -74,8 +74,9 @@ resource "random_string" "key_vault_infix" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  location = var.region
-  name     = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
+  enable_rbac_authorization = true
+  location                  = var.region
+  name                      = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
