@@ -9,6 +9,9 @@ terraform {
     azurerm = {
       source = "hashicorp/azurerm"
     }
+    random = {
+      source = "hashicorp/random"
+    }
   }
 }
 
@@ -40,7 +43,6 @@ resource "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_public_ip" "public_ip" {
-
   allocation_method   = "Dynamic"
   location            = var.region
   name                = "pip-${local.common_resource_suffix}"
@@ -60,6 +62,32 @@ resource "azurerm_network_interface" "network_interface" {
   resource_group_name = azurerm_resource_group.resource_group.name
 }
 
+locals {
+  key_vault_prefix          = "kv-"
+  key_vault_suffix          = "-eastus"
+  key_vault_name_max_length = 24
+}
+
+resource "random_string" "key_vault_infix" {
+  length  = local.key_vault_name_max_length - length(local.key_vault_prefix) - length(local.key_vault_suffix)
+  special = false
+}
+
+resource "azurerm_key_vault" "key_vault" {
+  location            = var.region
+  name                = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
+  resource_group_name = azurerm_resource_group.resource_group.name
+  sku_name            = "standard"
+  tenant_id           = var.tenant_id
+}
+
+resource "azurerm_key_vault_key" "key_vault_key" {
+  key_size     = 4096
+  key_type     = "RSA"
+  key_vault_id = azurerm_key_vault.key_vault.id
+  name         = "kvk-${local.common_resource_suffix}"
+}
+
 data "azurerm_platform_image" "platform_image" {
   location  = var.region
   offer     = "0001-com-ubuntu-server-impish"
@@ -69,7 +97,7 @@ data "azurerm_platform_image" "platform_image" {
 
 resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   admin_ssh_key {
-    public_key = var.public_key
+    public_key = azurerm_key_vault_key.key_vault_key.public_key_openssh
     username   = var.username
   }
   admin_username             = var.username

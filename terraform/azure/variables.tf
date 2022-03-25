@@ -1,13 +1,13 @@
-variable "public_key" {
-  description = "The public key which should be used for authentication, which needs to be at least 2048-bit and in ssh-rsa format."
-  sensitive   = true
-  type        = string
-}
-
 variable "region" {
   default     = "eastus"
   description = "The Azure region to deploy resources to."
   type        = string
+}
+
+variable "tenant_id" {
+  description = "value"
+  type        = string
+  sensitive   = true
 }
 
 variable "username" {
