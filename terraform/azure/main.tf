@@ -80,6 +80,7 @@ resource "azurerm_key_vault" "key_vault" {
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
+    ip_rules       = ["0.0.0.0/0"]
   }
   purge_protection_enabled   = true
   resource_group_name        = azurerm_resource_group.resource_group.name
