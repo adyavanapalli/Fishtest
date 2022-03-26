@@ -76,7 +76,10 @@ resource "random_string" "key_vault_infix" {
   special = false
 }
 
+#tfsec:ignore:azure-keyvault-no-purge
 resource "azurerm_key_vault" "key_vault" {
+  #bridgecrew:skip=CKV_AZURE_42:This setting doesn't actually exist.
+  #bridgecrew:skip=CKV_AZURE_110:Not setting `purge_protection_enabled` to allow purging the key vault.
   enable_rbac_authorization = true
   location                  = var.region
   name                      = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
