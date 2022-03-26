@@ -137,3 +137,16 @@ resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
     version   = data.azurerm_platform_image.platform_image.version
   }
 }
+
+# Azure Dynamic IP addresses are not allocated until they are associated with
+# some entity, so here, we wait until the VM is created before fetching it using
+# the `data` block type. This is later used in an output for constructing the
+# appropriate SSH command.
+data "azurerm_public_ip" "public_ip" {
+  name                = azurerm_public_ip.public_ip.name
+  resource_group_name = azurerm_resource_group.resource_group.name
+
+  depends_on = [
+    azurerm_linux_virtual_machine.linux_virtual_machine
+  ]
+}
