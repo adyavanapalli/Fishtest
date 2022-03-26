@@ -98,12 +98,15 @@ resource "azurerm_key_vault" "key_vault" {
 
 resource "tls_private_key" "private_key" {
   algorithm = "RSA"
+  rsa_bits  = 8192
 }
 
 resource "azurerm_key_vault_secret" "key_vault_secret" {
-  key_vault_id = azurerm_key_vault.key_vault.id
-  name         = "kvs-${local.common_resource_suffix}"
-  value        = tls_private_key.private_key.private_key_pem
+  content_type    = "OpenSSH RSA Private Key"
+  key_vault_id    = azurerm_key_vault.key_vault.id
+  name            = "kvs-${local.common_resource_suffix}"
+  value           = tls_private_key.private_key.private_key_pem
+  expiration_date = "2020-12-31T23:59:59Z"
 }
 
 data "azurerm_platform_image" "platform_image" {
