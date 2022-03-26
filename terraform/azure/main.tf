@@ -12,11 +12,18 @@ terraform {
     random = {
       source = "hashicorp/random"
     }
+    tls = {
+      source = "hashicorp/tls"
+    }
   }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = true
+    }
+  }
 }
 
 locals {
@@ -89,14 +96,14 @@ resource "azurerm_key_vault" "key_vault" {
   tenant_id                  = var.tenant_id
 }
 
-resource "azurerm_key_vault_key" "key_vault_key" {
-  expiration_date = "2022-12-31T23:59:59Z"
-  key_size        = 4096
-  #bridgecrew:skip=CKV_AZURE_112:No RSA-HSM needed for this use-case.
-  key_type     = "RSA"
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+resource "azurerm_key_vault_secret" "key_vault_secret" {
   key_vault_id = azurerm_key_vault.key_vault.id
-  name         = "kvk-${local.common_resource_suffix}"
-  key_opts     = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+  name         = "kvs-${local.common_resource_suffix}"
+  value        = tls_private_key.private_key.private_key_pem
 }
 
 data "azurerm_platform_image" "platform_image" {
@@ -108,7 +115,7 @@ data "azurerm_platform_image" "platform_image" {
 
 resource "azurerm_linux_virtual_machine" "linux_virtual_machine" {
   admin_ssh_key {
-    public_key = azurerm_key_vault_key.key_vault_key.public_key_openssh
+    public_key = tls_private_key.private_key.public_key_openssh
     username   = var.username
   }
   admin_username             = var.username
