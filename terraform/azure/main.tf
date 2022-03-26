@@ -65,45 +65,9 @@ resource "azurerm_network_interface" "network_interface" {
   resource_group_name = azurerm_resource_group.resource_group.name
 }
 
-locals {
-  key_vault_prefix          = "kv-"
-  key_vault_suffix          = "-eastus"
-  key_vault_name_max_length = 24
-}
-
-resource "random_string" "key_vault_infix" {
-  length  = local.key_vault_name_max_length - length(local.key_vault_prefix) - length(local.key_vault_suffix)
-  special = false
-}
-
-#tfsec:ignore:azure-keyvault-no-purge
-resource "azurerm_key_vault" "key_vault" {
-  #bridgecrew:skip=CKV_AZURE_42:This setting doesn't actually exist.
-  #bridgecrew:skip=CKV_AZURE_110:Not setting `purge_protection_enabled` to allow purging the key vault.
-  enable_rbac_authorization = true
-  location                  = var.region
-  name                      = "${local.key_vault_prefix}${random_string.key_vault_infix.result}${local.key_vault_suffix}"
-  network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
-    ip_rules       = ["0.0.0.0/0"]
-  }
-  resource_group_name = azurerm_resource_group.resource_group.name
-  sku_name            = "standard"
-  tenant_id           = var.tenant_id
-}
-
 resource "tls_private_key" "private_key" {
   algorithm = "RSA"
   rsa_bits  = 8192
-}
-
-resource "azurerm_key_vault_secret" "key_vault_secret" {
-  content_type    = "OpenSSH RSA Private Key"
-  key_vault_id    = azurerm_key_vault.key_vault.id
-  name            = "kvs-${local.common_resource_suffix}"
-  value           = tls_private_key.private_key.private_key_pem
-  expiration_date = "2022-12-31T23:59:59Z"
 }
 
 data "azurerm_platform_image" "platform_image" {
