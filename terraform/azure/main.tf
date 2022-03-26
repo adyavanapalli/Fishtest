@@ -19,11 +19,7 @@ terraform {
 }
 
 provider "azurerm" {
-  features {
-    key_vault {
-      purge_soft_delete_on_destroy = true
-    }
-  }
+  features {}
 }
 
 locals {
@@ -89,11 +85,9 @@ resource "azurerm_key_vault" "key_vault" {
     default_action = "Deny"
     ip_rules       = ["0.0.0.0/0"]
   }
-  purge_protection_enabled   = true
-  resource_group_name        = azurerm_resource_group.resource_group.name
-  sku_name                   = "standard"
-  soft_delete_retention_days = 90
-  tenant_id                  = var.tenant_id
+  resource_group_name = azurerm_resource_group.resource_group.name
+  sku_name            = "standard"
+  tenant_id           = var.tenant_id
 }
 
 resource "tls_private_key" "private_key" {
@@ -106,7 +100,7 @@ resource "azurerm_key_vault_secret" "key_vault_secret" {
   key_vault_id    = azurerm_key_vault.key_vault.id
   name            = "kvs-${local.common_resource_suffix}"
   value           = tls_private_key.private_key.private_key_pem
-  expiration_date = "2020-12-31T23:59:59Z"
+  expiration_date = "2022-12-31T23:59:59Z"
 }
 
 data "azurerm_platform_image" "platform_image" {
